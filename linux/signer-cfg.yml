@@ -1,0 +1,34 @@
+builder:
+  github:
+    enable: false
+  semaphore:
+    enable: false
+  selfhosted:
+    enable: true
+    # the Linux builder container (see docker-compose.yml)
+    url: http://builder:8090
+    # must equal BUILDER_KEY in .env
+    key: CHANGE_ME_builder_key
+# Public HTTPS address of this service. iPhones install via itms-services, which requires valid HTTPS.
+# (The builder does not use it: it reaches the service via SIGNTOOLS_INTERNAL_URL.)
+# local_transfer_dir / import_dir / upload_chunk_size_mb need the NimaQu/SignTools fork.
+server_url: https://sign.example.com
+redirect_https: false
+save_dir: data
+cleanup_interval_mins: 1
+# large apps (10+ GB) need time: download, extract, hash, re-pack, upload
+sign_timeout_mins: 60
+# browser uploads are split into requests of this size; needed behind Cloudflare (100 MB limit).
+# 0 = no splitting.
+upload_chunk_size_mb: 50
+# builder on the same machine: it works in this dir (see docker-compose.yml) and the two exchange
+# apps by path instead of over HTTP. Must be the same path in both containers. "" = off.
+local_transfer_dir: /data/work
+# big apps: copy them to linux/data/import/ on the host (rsync, SMB, scp...), then pick them in the
+# web UI with the "Server" switch. They are hard-linked into storage, not copied, and left in place.
+# Must be inside the same mount as save_dir for the hard link to work. "" = off.
+import_dir: /data/import
+basic_auth:
+  enable: true
+  username: "admin"
+  password: "CHANGE_ME"

@@ -1,0 +1,42 @@
+# SignTools web service + Linux builder on the same machine.
+#   cd linux && cp .env.example .env && docker compose up -d --build
+#
+# Both containers mount ./data at the same path (/data) and the builder works in /data/work, which is
+# the service's local_transfer_dir: the builder extracts the unsigned app straight from the service's
+# storage and hands the signed app back by path (a rename on the same filesystem). A 10+ GB app is
+# never copied over HTTP. Without local_transfer_dir (or with upstream SignTools) it falls back to
+# downloading and uploading over SIGNTOOLS_INTERNAL_URL.
+#
+# Big apps: copy them into ./data/import (rsync/SMB/scp) and pick them in the web UI ("Server" switch).
+services:
+  signtools:
+    # the NimaQu/SignTools fork (adds import_dir, local_transfer_dir and upload_chunk_size_mb)
+    build: https://github.com/NimaQu/SignTools.git
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./signer-cfg.yml:/signer-cfg.yml:ro
+      - ./data:/data
+
+  builder:
+    build:
+      context: ..
+      dockerfile: linux/Dockerfile
+    restart: unless-stopped
+    working_dir: /data/work
+    environment:
+      BUILDER_KEY: ${BUILDER_KEY:?set BUILDER_KEY in .env}
+      # keep >= sign_timeout_mins in signer-cfg.yml
+      BUILDER_TIMEOUT_MINS: "60"
+      # talk to the service over the compose network instead of its public server_url
+      SIGNTOOLS_INTERNAL_URL: http://signtools:8080
+      # set to 1 to refuse signing when the app asks for increased-memory-limit (or similar)
+      # but the provisioning profile does not grant it, instead of only warning
+      SIGN_REQUIRE_MEMORY_ENTITLEMENTS: ""
+    volumes:
+      # same host dir, same path as in the signtools container; needs room for the extracted app
+      # plus the signed copy (~2x the largest IPA) on top of what the service stores
+      - ./data:/data
+    expose:
+      - "8090"
