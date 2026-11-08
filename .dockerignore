@@ -1,0 +1,5 @@
+linux/work
+linux/data
+linux/.env
+**/node_modules
+.git
