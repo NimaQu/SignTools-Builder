@@ -121,9 +121,3 @@ modules.xml
 *.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/go,intellij+all,vscode
-# Linux signer: prebuilt support library injected together with tweaks
-!linux/libsubstrate/*.dylib
-# Linux signer deployment data
-linux/data/
-linux/work/
-linux/.env

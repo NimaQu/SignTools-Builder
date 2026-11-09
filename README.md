@@ -2,8 +2,6 @@
 
 This project is a free and simple builder server for [SignTools](https://github.com/SignTools/SignTools). It is the self-hosted alternative of [SignTools-CI](https://github.com/SignTools/SignTools-CI) - instead of using a Continuous Integration (CI) provider, you turn one of your own Macs into a builder used to pull, sign, and upload any iOS apps to your `SignTools` service.
 
-> **Linux builder (no Mac needed):** this fork adds [`linux/`](linux/README.md) — a Linux `sign.py` that signs with [rcodesign](https://github.com/indygreg/apple-platform-rs) instead of macOS `codesign`, with a Dockerfile and docker-compose setup, and optimizations for very large (10+ GB) apps.
-
 You only need to configure one builder. If you already configured a CI provider as your builder, you don't need to do anything here. This project is aimed at people who want to have a self-hosted builder.
 
 ## Important
